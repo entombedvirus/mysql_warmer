@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.version = "0.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Rohith Ravi"]
+  s.authors = ["Rohith Ravi", "Steven Lumos"]
   s.date = %q{2010-01-21}
   s.description = %q{mysql_warmer warms up a cold database by sniffing SQL queries from a hot machine and then repeating those queries on a cold machine}
   s.email = %q{entombedvirus@gmail.com}
@@ -28,9 +28,6 @@ Gem::Specification.new do |s|
      "bin/mysql_warmer",
      "lib/mysql_warmer.rb",
      "lib/mysql_warmer/em/mysql.rb",
-     "lib/mysql_warmer/pcaplet/pcap.so",
-     "lib/mysql_warmer/pcaplet/pcap_misc.rb",
-     "lib/mysql_warmer/pcaplet/pcaplet.rb",
      "mysql_warmer.gemspec",
      "test/helper.rb",
      "test/test_mysql_warmer.rb"

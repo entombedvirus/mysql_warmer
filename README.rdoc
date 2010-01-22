@@ -1,6 +1,26 @@
 = mysql_warmer
 
-Description goes here.
+The need for mysql_warmer arose out of having to add a newly seeded MySQL slave in to production rotation. Since the internal buffer pool is empty / not tuned for the queries that will be run on it, queries that would run in less than 1s often took > 1much higher with a cold MySQL cache.
+
+To alleviate the pain of addding a cold / untuned MySQL machine to the cluster, mysql_warmer simply executes the same queries that are being run on a warm slave, on a cold slave. You're expected to run a query reaper on the slave with some reasonable timeout so that the initial flood of slow queries will not kill the machine. And once enough time has gone by, both the warm slave and the cold slave will start exhibiting identical performance characteristics and then we can give production traffic to the new slave.
+
+== Install
+
+mysql_warmer has many dependencies. Make sure your system has libpcap installed with the dev headers.
+
+    $ sudo yum install libpcap libpcap-devel
+    $ gem install mysql_warmer
+
+== Usage
+
+On the cold slave:
+
+    $ mysql_warmer -u root -p sekret production_db &
+    $ <start a query reaper with a timeout of 10s or similar>
+
+On the warm slave:
+
+    $ sudo mysql_sniff <cold_slave_ip>
 
 == Note on Patches/Pull Requests
  
