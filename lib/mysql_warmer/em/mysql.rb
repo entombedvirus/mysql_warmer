@@ -1,3 +1,8 @@
+# This is stolen from Aman Gupta's em-mysql. I had to make a very minor modification to get this work
+# So it was easier to bundle it. 
+#
+# See http://github.com/tmm1/em-mysql for more.
+#
 require 'rubygems'
 require 'eventmachine'
 require 'mysqlplus'
