@@ -1,0 +1,72 @@
+#! /usr/bin/env ruby
+#
+
+require 'rubygems'
+require 'mysql_warmer'
+require 'optparse'
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: mysql_warmer [options] <db_name>"
+
+  options[:verbose] = false
+  opts.on('-v', '--verbose', 'Prints queries that are being run to warm up the db') do
+    options[:verbose] = true
+  end
+
+  options[:db_opts] = {}
+  opts.on('-u USER', 'Username to use when connecting to the cold database') do |username|
+    options[:db_opts][:username] = username
+  end
+  opts.on('-p PASSWORD', 'Password to use when connecting to the cold database') do |password|
+    options[:db_opts][:password] = password
+  end
+  opts.on('-h HOST', 'Hostname to use when connecting to the cold database') do |hostname|
+    options[:db_opts][:host] = hostname
+  end
+
+
+  options[:listen_port] = 10169
+  opts.on('-l PORT', "Port to listen on for queries. Default is #{options[:listen_port]}") do |port|
+    options[:listen_port] = port.to_i
+  end
+end.parse!
+
+options[:db_opts][:database] = ARGV.shift
+options[:db_opts].update(:on_error => proc {|e| STDERR.puts "%s - %s" % [e.class.name, e.message]}, :connections => 100)
+
+if options[:db_opts][:database].nil?
+  puts "Please specify a database to run the queries aganist."
+  return
+end
+
+SQL = MysqlWarmer::EventedMysql
+SQL.settings.update options[:db_opts]
+
+module MysqlSpammer
+  def initialize(options)
+    @options = options
+    @query = ""
+  end
+
+  def receive_data(data)
+    @query << data
+  end
+  
+  def unbind
+    return if @query.empty?
+  
+    puts @query.inspect if @options[:verbose]
+    SQL.raw(@query) {}
+  end
+end
+
+trap("INT") { EM.stop_event_loop; puts "Exiting..." }
+
+EM.run do
+  EM.start_server '0.0.0.0', options[:listen_port], MysqlSpammer, options
+  puts "Waiting for queries on port %d..." % options[:listen_port]
+end
+
+

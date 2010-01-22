@@ -1,0 +1,61 @@
+#! /usr/bin/env ruby
+
+require 'pcaplet'
+require 'socket'
+require 'optparse'
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: sudo mysql_sniff [OPTIONS] <mysql_warmer_host> [mysql_warmer_port]'
+
+  options[:verbose] = false
+  opts.on('-v', '--verbose', 'Outputs the SQL queries sniffed off the wire') do |verbose|
+    options[:verbose] = true
+  end
+end.parse!
+
+
+warmer_host = ARGV.shift
+warmer_port = (ARGV.shift || 10169).to_i
+
+if warmer_host.nil?
+  puts "Please specify where the mysql_warmer script is running"
+  return
+end
+
+MYSQL_COM_QUERY = 0x03
+
+mysqlsniff = Pcaplet.new('-s 65535 -i eth0')
+mysqlsniff.add_filter Pcap::Filter.new('tcp port 3306', mysqlsniff.capture)
+
+query = ''
+query_length = 0
+
+mysqlsniff.each_packet do |pkt|
+  next unless pkt.tcp_data
+  if query then
+    if query.length == query_length then
+      if options[:verbose]
+        puts query
+        puts '-' * 80
+      end
+
+      s = TCPSocket.open(warmer_host, warmer_port)
+      s.write(query)
+      s.close
+
+      query = nil
+      query_length = 0
+    else
+      query << pkt.tcp_data
+    end
+  end
+
+  if pkt.tcp_data[3] == 0 and pkt.tcp_data[4] == MYSQL_COM_QUERY then
+    query_length = (pkt.tcp_data[0,3] + "\0").unpack('V')[0] - 1
+    next if query_length < 1
+    query = pkt.tcp_data[5..-1]
+  end
+end
+

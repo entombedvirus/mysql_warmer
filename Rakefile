@@ -5,12 +5,14 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "mysql_warmer"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
-    gem.email = "rohith@seriousbusiness.com"
+    gem.summary = %Q{Couple command line utilities to warm a cold MySQL database}
+    gem.description = %Q{mysql_warmer warms up a cold database by sniffing SQL queries from a hot machine and then repeating those queries on a cold machine}
+    gem.email = "entombedvirus@gmail.com"
     gem.homepage = "http://github.com/entombedvirus/mysql_warmer"
-    gem.authors = ["Rohith Ravi"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+    gem.authors = ["Rohith Ravi", "Steven Lumos"]
+    gem.add_dependency "eventmachine", ">= 0.12.9"
+    gem.add_dependency "mysqlplus", ">= 0.1.0"
+    gem.add_dependency "pcap"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
