@@ -1,6 +1,6 @@
 = mysql_warmer
 
-The need for mysql_warmer arose out of having to add a newly seeded MySQL slave in to production rotation. Since the internal buffer pool is empty / not tuned for the queries that will be run on it, queries that would run in less than 1s often took > 1much higher with a cold MySQL cache.
+The need for mysql_warmer arose out of having to add a newly seeded MySQL slave in to production rotation. Since the internal buffer pool is empty / not tuned for the queries that will be run on it, queries that would run in less than 1s often took much higher with a cold MySQL cache.
 
 To alleviate the pain of addding a cold / untuned MySQL machine to the cluster, mysql_warmer simply executes the same queries that are being run on a warm slave, on a cold slave. You're expected to run a query reaper on the slave with some reasonable timeout so that the initial flood of slow queries will not kill the machine. And once enough time has gone by, both the warm slave and the cold slave will start exhibiting identical performance characteristics and then we can give production traffic to the new slave.
 
