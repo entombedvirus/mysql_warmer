@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mysql_warmer}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rohith Ravi", "Steven Lumos"]
-  s.date = %q{2010-01-21}
+  s.date = %q{2010-02-01}
   s.description = %q{mysql_warmer warms up a cold database by sniffing SQL queries from a hot machine and then repeating those queries on a cold machine}
   s.email = %q{entombedvirus@gmail.com}
   s.executables = ["mysql_sniff", "mysql_warmer"]
