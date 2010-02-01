@@ -17,7 +17,7 @@ OptionParser.new do |opts|
 
   options[:db_opts] = {}
   opts.on('-u USER', 'Username to use when connecting to the cold database') do |username|
-    options[:db_opts][:username] = username
+    options[:db_opts][:user] = username
   end
   opts.on('-p PASSWORD', 'Password to use when connecting to the cold database') do |password|
     options[:db_opts][:password] = password
@@ -55,7 +55,7 @@ module MysqlSpammer
   end
   
   def unbind
-    return if @query.empty?
+    return if @query.empty? or @query !~ /^select/i 
   
     puts @query.inspect if @options[:verbose]
     SQL.raw(@query) {}
